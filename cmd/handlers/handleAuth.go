@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fitness-api/cmd/models"
+	"fitness-api/cmd/repositories"
 	"fmt"
 	"net/http"
 	"time"
@@ -23,15 +24,18 @@ type JwtClaims struct {
 func Login(c echo.Context) error {
 	credentials := models.Credentials{}
 	c.Bind(&credentials)
-	fmt.Println("Bound params", credentials)
 
-	if credentials.Username != "walter" && credentials.Password != "secret" {
+	/*if credentials.Username != "walter" && credentials.Password != "secret" {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Wrong credentials", "message": "Access denied"})
+	}*/
+
+	user, isCorrect := repositories.AuthenticateUser(credentials.Username, credentials.Password)
+	if !isCorrect {
 		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Wrong credentials", "message": "Access denied"})
 	}
 
-	fmt.Println("Correct Credentials")
 	claims := &JwtClaims{
-		Name:  "Walter",
+		Name:  user.Name,
 		UUID:  "444-555-dscedf-kaqwsa",
 		Admin: true,
 		StandardClaims: jwt.StandardClaims{

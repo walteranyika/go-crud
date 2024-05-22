@@ -58,3 +58,4 @@ func GetUser(c echo.Context) error{
 	}
 	return c.JSON(http.StatusOK, user)
 }
+
