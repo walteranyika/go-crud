@@ -23,25 +23,25 @@ func main() {
 
 	e.POST("/login", handlers.Login)
 
-	protected := e.Group("/api")
+	securedGroup := e.Group("/api")
 	config := middleware.JWTConfig{
 		Claims:     &handlers.JwtClaims{},
 		SigningKey: []byte(handlers.SECRET),
 	}
-	protected.Use(middleware.JWTWithConfig(config))
-	protected.GET("/test/user", func(c echo.Context) error {
+	securedGroup.Use(middleware.JWTWithConfig(config))
+	securedGroup.GET("/test/user", func(c echo.Context) error {
 		user := c.Get("user").(*jwt.Token)
 		claims := user.Claims.(*handlers.JwtClaims)
 		name := claims.Name
 		return c.JSON(http.StatusOK, map[string]string{"name": name})
 	})
 
-	protected.GET("/users", handlers.GetAllUsers)
-	protected.GET("/users/:id", handlers.GetUser)
-	protected.POST("/users", handlers.CreateUser)
-	protected.POST("/measurements", handlers.CreateMeasurement)
-	protected.PUT("/users/:id", handlers.UpdateUser)
-	protected.PUT("/measurements/:id", handlers.UpdateMeasurement)
+	securedGroup.GET("/users", handlers.GetAllUsers)
+	securedGroup.GET("/users/:id", handlers.GetUser)
+	securedGroup.POST("/users", handlers.CreateUser)
+	securedGroup.POST("/measurements", handlers.CreateMeasurement)
+	securedGroup.PUT("/users/:id", handlers.UpdateUser)
+	securedGroup.PUT("/measurements/:id", handlers.UpdateMeasurement)
 
 	e.Logger.Fatal(e.Start(":3000"))
 }
